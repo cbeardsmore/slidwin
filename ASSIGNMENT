@@ -1,0 +1,70 @@
+compile			= "assignment.c"
+
+
+// LINK ATTRIBUTES -------------------------------------------------------------
+
+bandwidth           = 99999999Mbps,
+messagerate         = 1000ms,
+propagationdelay    = 250ms,
+probframecorrupt    = 5,
+probframeloss       = 5,
+
+// NODE ATTRIBUTES -------------------------------------------------------------
+
+host Australia
+{
+    x=380, y=170
+    winx=0, winy=500
+    outputfile = "Australia.log"
+    link to Fiji {}
+    link to NewZealand {}
+    link to Indonesia {}
+}
+
+    host Fiji
+    {
+        winx=500, winy=0
+        outputfile = "Fiji.log"
+        north east of Australia
+    }
+
+    host NewZealand
+    {
+        winx=900, winy=0
+        outputfile = "NewZealand.log"
+        south east of australia
+    }
+
+host Indonesia
+{
+    winx=1300, winy=0
+    outputfile = "Indonesia.log"
+    west west of Australia
+    link to Singapore {}
+    link to Malaysia {}
+    link to Brunei {}
+}
+
+    host Singapore
+    {
+        winx=500, winy=500
+        outputfile = "Singapore.log"
+        south west west west of Australia
+        link to Malaysia {}
+    }
+
+    host Malaysia
+    {
+        winx=900, winy=500
+        outputfile = "Malyasia.log"
+        west west west of Australia
+    }
+
+    host Brunei
+    {
+        winx=1300, winy=500
+        outputfile = "Brunei.log"
+        north of Indonesia
+    }
+
+// -----------------------------------------------------------------------------
