@@ -190,7 +190,7 @@ static void datalinkDown(FRAME frame, int inLink, int outLink)
                 {    
                     CNET_disable_application( ii );
                     printf("\t\t\t\t\tDISABLED APPLICATION\n");
-                    CNET_set_LED( outLink, "red" );
+                    CNET_set_LED( outLink-1, "red" );
                 }
             }
         }
@@ -230,11 +230,11 @@ static void datalinkDown(FRAME frame, int inLink, int outLink)
         {
             for ( int ii = 0; ii < NUM_NODES; ii++ )
             { 
-                if ( routingTable[nodeinfo.nodenumber][ii] == outLink )
+                if ( routingTable[nodeinfo.nodenumber][ii] == inLink )
                 {    
                     CNET_disable_application( ii );
                     printf("DISABLED APPLICATION\n");
-                    CNET_set_LED( outLink , "red" );
+                    CNET_set_LED( inLink-1 , "red" );
                 }
             }        
         }
@@ -431,7 +431,7 @@ static void ackReceived(FRAME frame, int link)
     {
         printf("\t\t\t\t\tENABLING APPLICATION\n");
         CHECK(CNET_enable_application(ALLNODES));
-        for ( int ii = 0; ii < CNET_NLEDS; ii++ )
+        for ( int ii = 0; ii < nodeinfo.nlinks; ii++ )
             CNET_set_LED(ii, "green" );
     }
 
