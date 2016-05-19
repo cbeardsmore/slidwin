@@ -128,16 +128,12 @@ static void networkUp(FRAME frame, int link)
         // THROW DATA UP TO TRANSPORT LAYER
         transportUp( data, dataLength );
 
-        // SET LED TO GREEN TO SHOW THAT MESSAGE ARRIVED FOR ME
-        CNET_set_LED( link-1, "green" );
     }
     else
     {
         // LET FORWARD FRAME RE-ROUTE TO CORRECT PLACE
         forwardFrame( frame, link );
 
-        // SET LED TO ORANGE TO SHOW THAT MESSAGE WAS FORWARDED
-        CNET_set_LED( link-1, "orange" );
     }
 }
 
@@ -187,9 +183,16 @@ static void datalinkDown(FRAME frame, int inLink, int outLink)
         if (numInWindow[outLink - 1] >= MAX_SEQ)
         {
             // DISABLE GENERATION OF NEW MESSAGES
-            CNET_disable_application(ALLNODES);
-            printf("\t\t\t\t\tDISABLED APPLICATION\n");
-            CNET_set_LED( LAST_LED, "red" );
+
+            for ( int ii = 0; ii < NUM_NODES; ii++ )
+            { 
+                if ( routingTable[nodeinfo.nodenumber][ii] == outLink )
+                {    
+                    CNET_disable_application( ii );
+                    printf("\t\t\t\t\tDISABLED APPLICATION\n");
+                    CNET_set_LED( outLink, "red" );
+                }
+            }
         }
     }
     else
@@ -225,10 +228,15 @@ static void datalinkDown(FRAME frame, int inLink, int outLink)
         // IF THE WINDOW IS CURRENTLY FULL
         if (numInWindow[inLink - 1] >= MAX_SEQ)
         {
-            // DISABLE GENERATING MESSAGES UNTIL WINDOW/BUFFER EMPTIES
-            CNET_disable_application(ALLNODES);
-            printf("DISABLED APPLICATION\n");
-            CNET_set_LED( LAST_LED, "red" );
+            for ( int ii = 0; ii < NUM_NODES; ii++ )
+            { 
+                if ( routingTable[nodeinfo.nodenumber][ii] == outLink )
+                {    
+                    CNET_disable_application( ii );
+                    printf("DISABLED APPLICATION\n");
+                    CNET_set_LED( outLink , "red" );
+                }
+            }        
         }
 
     }
@@ -359,10 +367,7 @@ static void datalinkUp(CnetEvent ev, CnetTimerID timer, CnetData data)
 static void ackReceived(FRAME frame, int link)
 {
     FRAME tempFrame;
-    int first, second, third;
-
-    // SET LED TO BLUE TO SHOW THAT ACK RECEIVED ON THIS LINK
-    CNET_set_LED( link-1, "blue" );
+    int first, second, third, fourth;
 
     // PRINT ACKOWLEDGEMENT MESSAGE
     printf("\n\t\t\t\t\tACK RECEIVED\n");
@@ -419,15 +424,18 @@ static void ackReceived(FRAME frame, int link)
     first  = ( numInBuffer[0] == 0 ) && ( numInWindow[0] < MAX_SEQ );
     second = ( numInBuffer[1] == 0 ) && ( numInWindow[1] < MAX_SEQ );
     third  = ( numInBuffer[2] == 0 ) && ( numInWindow[2] < MAX_SEQ );
+    fourth = ( numInBuffer[3] == 0 ) && ( numInWindow[3] < MAX_SEQ );
 
     // REENABLE APPLICATION LAYER TO GENERATE MESSAGES AGAIN
-    if ( first && second && third )
+    if ( first && second && third && fourth )
     {
         printf("\t\t\t\t\tENABLING APPLICATION\n");
         CHECK(CNET_enable_application(ALLNODES));
-        CNET_set_LED( LAST_LED, "green" );
+        for ( int ii = 0; ii < CNET_NLEDS; ii++ )
+            CNET_set_LED(ii, "green" );
     }
 
+            
     printBuffers(link);
 }
 
@@ -578,9 +586,8 @@ void reboot_node(CnetEvent ev, CnetTimerID timer, CnetData data)
     // ENABLE ALL NODES TO SEND TO ALL OTHER NODES
     CHECK(CNET_enable_application(ALLNODES));
     // SET LEDS TO ALL BLACK INITIALLY
-    for ( int jj = 0; jj < CNET_NLEDS; jj++ )
-        CNET_set_LED( jj, "black" );
-    CNET_set_LED( LAST_LED, "green" );
+    for ( int jj = 0; jj < nodeinfo.nlinks; jj++ )
+        CNET_set_LED( jj, "green" );
 }
 
 //**************************************************************************

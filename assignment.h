@@ -17,11 +17,12 @@
  //**************************************************************************
 
 #define FRAME_SIZE(f)    ((sizeof(FRAME) - sizeof(f.data)) + f.len)
-#define MAX_SEQ          10         // SIZE OF THE WINDOW
+#define MAX_SEQ          4         // SIZE OF THE WINDOW
 #define MAX_LINKS        4         // MAX LINKS ANY ONE NODE HAS
 #define MAGIC_NUM        8000000   // MAGIC CNET TIMEOUT VALUE
 #define T_MOD            4         // MODIFIER APPLIED TO TIMEOUT
 #define LAST_LED         5         // ID OF THE LAST CNET LED
+#define NUM_NODES        7
 
 //**************************************************************************
 // GLOBAL VARIABLES - FOR SIMULATION ONLY
