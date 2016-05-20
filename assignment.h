@@ -17,12 +17,12 @@
  //**************************************************************************
 
 #define FRAME_SIZE(f)    ((sizeof(FRAME) - sizeof(f.data)) + f.len)
-#define MAX_SEQ          4         // SIZE OF THE WINDOW
+#define MAX_SEQ          4         // SIZE OF THE WINDOW IS 1 + THIS
 #define MAX_LINKS        4         // MAX LINKS ANY ONE NODE HAS
 #define MAGIC_NUM        8000000   // MAGIC CNET TIMEOUT VALUE
 #define T_MOD            4         // MODIFIER APPLIED TO TIMEOUT
 #define LAST_LED         5         // ID OF THE LAST CNET LED
-#define NUM_NODES        7
+#define NUM_NODES        7         // TOTAL NODES IN THE SYSTEM
 
 //**************************************************************************
 // GLOBAL VARIABLES - FOR SIMULATION ONLY
@@ -106,36 +106,37 @@ static	int	frameExpected[MAX_LINKS]    = {0, 0, 0, 0};
 // FUNCTION PROTOTYPES
 //**************************************************************************
 
-
 // TRANSPORT LAYER
-static void transportDown(CnetEvent, CnetTimerID, CnetData);
-static void transportUp(char* data, size_t dataLength);
+static void transport_down(CnetEvent, CnetTimerID, CnetData);
+static void transport_up(char* data, size_t dataLength);
 
 // NETWORK LAYER
-static void networkDown(char*, size_t, int);
-static void forwardFrame(FRAME, int);
-static int getRoute(int);
-static void networkUp(FRAME, int);
+static void network_down(char*, size_t, int);
+static void forward_frame(FRAME, int);
+static int get_route(int);
+static void network_up(FRAME, int);
 
 // DATA LINK LAYER
-static void datalinkDown(FRAME, int, int);
-static void transmitAck(int, int);
-static void transmitFrame(FRAME);
-static void datalinkUp(CnetEvent, CnetTimerID, CnetData);
-static void ackReceived(FRAME, int);
+static void datalink_down(FRAME, int, int);
+static void transmit_ack(int, int);
+static void transmit_frame(FRAME);
+static void datalink_up(CnetEvent, CnetTimerID, CnetData);
+static void ack_received(FRAME, int);
 
 // TIMEOUTS
-static void setTimer(FRAME);
-static void timeoutLink1(CnetEvent, CnetTimerID, CnetData);
-static void timeoutLink2(CnetEvent, CnetTimerID, CnetData);
-static void timeoutLink3(CnetEvent, CnetTimerID, CnetData);
-static void timeoutLink4(CnetEvent, CnetTimerID, CnetData);
+static void set_timer(FRAME);
+static void timeout_link_1(CnetEvent, CnetTimerID, CnetData);
+static void timeout_link_2(CnetEvent, CnetTimerID, CnetData);
+static void timeout_link_3(CnetEvent, CnetTimerID, CnetData);
+static void timeout_link_4(CnetEvent, CnetTimerID, CnetData);
 
 // NODE INITIALIZATION
 void reboot_node(CnetEvent, CnetTimerID, CnetData);
 
 // MISCELLANEOUS
+static void draw_frame(CnetEvent, CnetTimerID, CnetData);
 static int between(int, int, int);
-static void printBuffers(int);
+static void print_buffers(int);
 static void inc(int*);
+
 //---------------------------------------------------------------------------

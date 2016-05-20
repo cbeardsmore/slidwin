@@ -8,6 +8,7 @@ messagerate         = 1000ms,
 propagationdelay    = 250ms,
 probframecorrupt    = 5,
 probframeloss       = 5,
+mapcolour           = "cyan"
 
 // NODE ATTRIBUTES -------------------------------------------------------------
 
