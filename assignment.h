@@ -139,3 +139,7 @@ static int between(int, int, int);
 static void printBuffers(int);
 static void inc(int*);
 //---------------------------------------------------------------------------
+
+
+
+static void draw_frame(CnetEvent, CnetTimerID, CnetData);

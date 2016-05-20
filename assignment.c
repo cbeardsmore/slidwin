@@ -233,7 +233,7 @@ static void datalinkDown(FRAME frame, int inLink, int outLink)
                 if ( routingTable[nodeinfo.nodenumber][ii] == inLink )
                 {    
                     CNET_disable_application( ii );
-                    printf("DISABLED APPLICATION\n");
+                    printf("DISABLE APPLICATION\n");
                     CNET_set_LED( inLink-1 , "red" );
                 }
             }        
@@ -578,6 +578,8 @@ void reboot_node(CnetEvent ev, CnetTimerID timer, CnetData data)
     CHECK(CNET_set_handler( EV_TIMER3,		      timeoutLink3,	    0));
     CHECK(CNET_set_handler( EV_TIMER4,            timeoutLink4,     0));
 
+    CHECK(CNET_set_handler( EV_DRAWFRAME, draw_frame, 0));    
+
     // INITIALISE TIMER ARRAY TO NULL TIMERS
     for ( int ii = 0; ii < MAX_LINKS; ii++ )
         for ( int jj = 0; jj < MAX_SEQ + 1; jj++ )
@@ -593,6 +595,37 @@ void reboot_node(CnetEvent ev, CnetTimerID timer, CnetData data)
 //**************************************************************************
 // MISC FUNCTIONS
 //**************************************************************************
+
+
+static void draw_frame(CnetEvent ev, CnetTimerID timer, CnetData data)
+{
+    CnetDrawFrame *df  = (CnetDrawFrame *)data;
+    FRAME         *f   = (FRAME *)df->frame;
+
+    switch (f->kind) {
+    case DL_ACK:
+        df->nfields    = 1;
+        df->colours[0] = (f->seq == 0) ? "red" : "purple";
+        df->pixels[0]  = 10;
+        sprintf(df->text, "ack=%d", f->seq);
+        break;
+
+    case DL_DATA:
+        df->nfields    = 2;
+        df->colours[0] = (f->seq == 0) ? "red" : "purple";
+        df->pixels[0]  = 10;
+        df->colours[1] = "green";
+        df->pixels[1]  = 30;
+        sprintf(df->text, "data=%d", f->seq);
+        break;
+    }
+}
+
+
+
+
+
+
 // FUNCTION: inc
 // IMPORT: num (int*)
 // PURPOSE: Increment a sequence number, resetting to 0 if above max seqnum
