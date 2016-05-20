@@ -21,7 +21,7 @@ static void transport_down(CnetEvent ev, CnetTimerID timer, CnetData data)
 {
     int destination;
 
-    // ALLOCATE MEMORY FOR MESSAGE SO WE CAN PASS ARRANGE ON THE HEAP
+    // ALLOCATE MEMORY FOR MESSAGE SO WE CAN PASS ARRAY ON THE HEAP
     char* msg = (char*)malloc(MAX_MESSAGE_SIZE * sizeof(char));
     size_t msgLength = MAX_MESSAGE_SIZE * sizeof(char);
     // READ THE MESSAGE FROM THE APPLICATION LAYER AND THROW DOWN
@@ -39,7 +39,7 @@ static void transport_down(CnetEvent ev, CnetTimerID timer, CnetData data)
 
 static void transport_up( char* data, size_t dataLength )
 {
-    // WRITE THE MESSAGE BACK TO THE APPLICATION
+    // WRITE THE MESSAGE BACK TO THE APPLICATION LAYER
     CHECK(CNET_write_application( data, &dataLength ));
 }
 
@@ -70,7 +70,7 @@ static void network_down( char* data, size_t dataLength, int destination )
     // THROW FRAME DOWN TO DATA LINK LAYER
     datalink_down(frame, frame.link, 0);
 
-    // DEBUG ONLY
+    // PRINT CONTENT OF WINDOW AND BUFFER
     print_buffers(frame.link);
 }
 
@@ -78,7 +78,7 @@ static void network_down( char* data, size_t dataLength, int destination )
 
 // FUNCTION: forward_frame
 // IMPORT: frame (FRAME), inLink (int)
-// PURPOSE: Takes in a frame and resends out to its actual destination
+// PURPOSE: Takes in a frame and forwards out to its actual destination
 
 static void forward_frame(FRAME frame, int inLink)
 {
@@ -115,6 +115,7 @@ static int get_route(int destination)
 
 static void network_up(FRAME frame, int link)
 {
+    // IF THE FRAME'S DESTINATION IS THIS NODE
     if ( frame.destNode == nodeinfo.nodenumber )
     {
         // UNPACK MESSAGE AND SEND TO TRANSPORT LAYER
@@ -128,6 +129,7 @@ static void network_up(FRAME frame, int link)
         // THROW DATA UP TO TRANSPORT LAYER
         transport_up( data, dataLength );
     }
+    // FRAMES DESTINATION IS NOT THIS NODE, MUST BE FORWARDED
     else
     {
         // LET FORWARD FRAME RE-ROUTE TO CORRECT PLACE
@@ -139,8 +141,14 @@ static void network_up(FRAME frame, int link)
 // DATA LINK LAYER - DOWN
 //**************************************************************************
 
+// FUNCTION: datalink_down
+// IMPORT: frame (FRAME), inLink (int), outLink (int)
+// PURPOSE: Takes a frame and writes down to physical layer. If frame is
+//          being forwarded (outLink != 0), also transmit an ACK
+
 static void datalink_down(FRAME frame, int inLink, int outLink)
 {
+    // FRAME IS BEING FORWARDED
     if ( outLink != 0 )
     {
         // MORE ROOM TO SEND SO TRANSMIT FRAME
@@ -451,7 +459,8 @@ static void set_timer(FRAME frame)
     timeout = FRAME_SIZE(frame)*((CnetTime)MAGIC_NUM / linkinfo[link].bandwidth);
     timeout += linkinfo[link].propagationdelay;
 
-    // START SPECIFIC TIMER FOR CORRECT LINK
+    // START SPECIFIC TIMER FOR CORRECT LINK. EVERY LINK USES A SEPERATE
+    // TIMER QUEUE
     switch (link)
     {
         case 1:
@@ -468,7 +477,7 @@ static void set_timer(FRAME frame)
             break;
     }
 
-    // STORE TIMER IN THE TIMER ARRAY
+    // STORE TIMER ID IN THE TIMER ARRAY FOR LATER REFERENCE
     timers[link - 1][seqNum] = timerID;
 }
 
@@ -559,18 +568,18 @@ static void timeout_link_4(CnetEvent ev, CnetTimerID timer, CnetData data)
 
 // FUNCTION: reboot_node
 // IMPORT: ev (CnetEvent), timer (CnetTimerID), data (CnetData)
-// PURPOSE: Initalization for every node
+// PURPOSE: Initalization for every node, set event handlers
 
 void reboot_node(CnetEvent ev, CnetTimerID timer, CnetData data)
 {
     // SET EVENT HANDLERS
-    CHECK(CNET_set_handler( EV_APPLICATIONREADY,  transport_down, 0));
-    CHECK(CNET_set_handler( EV_PHYSICALREADY,     datalink_up,    0));
-    CHECK(CNET_set_handler( EV_TIMER1,		      timeout_link_1, 0));
-    CHECK(CNET_set_handler( EV_TIMER2,		      timeout_link_2, 0));
-    CHECK(CNET_set_handler( EV_TIMER3,		      timeout_link_3, 0));
-    CHECK(CNET_set_handler( EV_TIMER4,            timeout_link_4, 0));
-    CHECK(CNET_set_handler( EV_DRAWFRAME, draw_frame, 0));    
+    CHECK(CNET_set_handler( EV_APPLICATIONREADY,  transport_down,   0));
+    CHECK(CNET_set_handler( EV_PHYSICALREADY,     datalink_up,      0));
+    CHECK(CNET_set_handler( EV_TIMER1,		      timeout_link_1,   0));
+    CHECK(CNET_set_handler( EV_TIMER2,		      timeout_link_2,   0));
+    CHECK(CNET_set_handler( EV_TIMER3,		      timeout_link_3,   0));
+    CHECK(CNET_set_handler( EV_TIMER4,            timeout_link_4,   0));
+    CHECK(CNET_set_handler( EV_DRAWFRAME,         draw_frame,       0));    
 
     // INITIALISE TIMER ARRAY TO NULL TIMERS
     for ( int ii = 0; ii < MAX_LINKS; ii++ )
@@ -579,9 +588,14 @@ void reboot_node(CnetEvent ev, CnetTimerID timer, CnetData data)
 
     // ENABLE ALL NODES TO SEND TO ALL OTHER NODES
     CHECK(CNET_enable_application(ALLNODES));
-    // SET LEDS TO ALL BLACK INITIALLY
+
+    // SET LEDS FOR LINKS TO ALL GREEN INITIALLY
     for ( int jj = 0; jj < nodeinfo.nlinks; jj++ )
         CNET_set_LED( jj, "green" );
+
+    // SET LEDS FOR NON-USED LIGHTS TO ALL BLACK INITIALLY
+    for ( int kk = nodeinfo.nlinks; kk < CNET_NLEDS; kk++ )
+        CNET_set_LED( kk, "black" );
 }
 
 //**************************************************************************
@@ -597,6 +611,7 @@ static void draw_frame(CnetEvent ev, CnetTimerID timer, CnetData data)
 {
 
     // NOT MY CODE, THIS IS CHRIS MACDONALDS FUNCTION, REFERENCED IN REPORT
+    // DID NOT MODIFY TERNARY'S FOR THIS REASON
 
     CnetDrawFrame *df  = (CnetDrawFrame *)data;
     FRAME         *f   = (FRAME *)df->frame;
@@ -620,6 +635,8 @@ static void draw_frame(CnetEvent ev, CnetTimerID timer, CnetData data)
             break;
     }
 }
+
+//**************************************************************************
 
 // FUNCTION: inc
 // IMPORT: num (int*)
@@ -648,6 +665,7 @@ static int between(int lower, int num, int upper)
     int second =  ( upper < lower ) && ( lower <= num );
     int third = ( num < upper ) && ( upper < lower );
 
+    // EXPORT AS SIMPLE BOOLEAN VALUE
     return ( first || second || third );
 }
 
@@ -660,21 +678,21 @@ static int between(int lower, int num, int upper)
 static void print_buffers(int link)
 {
     // PRINT SEQUENCE NUMBER OF ALL FRAMES IN THE WINDOW
-    printf("ACTUAL: [");
-    for (int ii = 0; ii < MAX_SEQ + 1; ii++)
+    printf("WINDOW: [%d", window[link - 1][0].seq );
+    for (int ii = 1; ii < MAX_SEQ + 1; ii++)
     {
-        printf("%d", window[link - 1][ii].seq);
         printf("|");        
+        printf("%d", window[link - 1][ii].seq);      
     }
     printf("]\n");
 
 
-    // PRINT WINDOW STATUS INDICATORS
-    printf("WINDOW:\t[%d|%d] = %d\n", ackExpected[link - 1],
+    // PRINT WINDOW START AND END BOUNDS, LENGTH OF WINDOW
+    printf("WINDOW LENGTH:\t[%d|%d] = %d\n", ackExpected[link - 1],
                                     nextFrameToSend[link - 1],
                                     numInWindow[link - 1]);
-    // PRINT BUFFER START, FINISH AND NUMBER OF ITEMS
-    printf("BUFFER:\t[%d|%d] = %d\n\n", bufferBounds[link - 1][0],
+    // PRINT BUFFER START AND END BOUNDS, LENGTH OF BUFFER
+    printf("BUFFER LENGTH:\t[%d|%d] = %d\n\n", bufferBounds[link - 1][0],
                                     bufferBounds[link - 1][1],
                                     numInBuffer[link - 1]);
 }
