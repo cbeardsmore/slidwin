@@ -230,7 +230,7 @@ static void datalink_down(FRAME frame, int inLink, int outLink)
                 if ( routingTable[nodeinfo.nodenumber][ii] == inLink )
                 {    
                     CNET_disable_application( ii );
-                    printf("DISABLE APPLICATION\n");
+                    printf("DISABLE APPLICATION FOR %s\n", nodenames[ii] );
                     CNET_set_LED( inLink-1 , "red" );
                 }
             }        
@@ -280,7 +280,7 @@ static void transmit_frame(FRAME frame)
         printf("\nACK TRANSMITTED\n");
     }
 
-    printf("VIA LINK:\t%d\nSEQ NO:\t%d\n", frame.link, frame.seq);
+    printf("VIA LINK:\t%d\nSEQ NO:\t%d\n\n", frame.link, frame.seq);
 
     // CALCULATE THE CHECKSUM AND ADD TO THE FRAME
     frame.checksum = 0;
@@ -368,13 +368,12 @@ static void ack_received(FRAME frame, int link)
 
     // PRINT ACKOWLEDGEMENT MESSAGE
     printf("\n\t\t\t\t\tACK RECEIVED\n");
-    printf("\t\t\t\t\tIN LINK:\t%d\n", link);
+    printf("\t\t\t\t\tIN LINK:%d\n", link);
     printf("\t\t\t\t\tSEQ NO:\t%d\n", frame.seq);
 
     // ENSURE ACK NUMBER IS BETWEEN ACK EXPECTED AND NEXT FRAME TO SEND
     if (between(ackExpected[link - 1], frame.seq, nextFrameToSend[link - 1]))
     {
-        print_buffers(link);
 
         // LOOP UNTIL ACKEXPECTED IS ONE MORE THAN THE SEQNUM OF THE ACK
         while (between(ackExpected[link - 1], frame.seq, nextFrameToSend[link - 1]))
@@ -384,8 +383,6 @@ static void ack_received(FRAME frame, int link)
             // INCREMENT ACKEXPECTED AND DECREASE NUMBER IN WINDOW
             inc(&ackExpected[link - 1]);
             numInWindow[link - 1] -= 1;
-
-            print_buffers(link);
         }
     }
     else
@@ -399,7 +396,7 @@ static void ack_received(FRAME frame, int link)
     {
         // ADD FRAMES FROM THE BUFFER TO THE WINDOW
         printf("\t\t\t\t\tSENDING FRAME FROM BUFFER\n");
-        print_buffers(link);
+        //print_buffers(link);
 
         // REMOVE FRAME FROM THE FRONT OF THE BUFFER
         tempFrame = buffer[link - 1][bufferBounds[link - 1][0]];
@@ -426,7 +423,6 @@ static void ack_received(FRAME frame, int link)
     // REENABLE APPLICATION LAYER TO GENERATE MESSAGES AGAIN
     if ( first && second && third && fourth )
     {
-        printf("\t\t\t\t\tENABLING APPLICATION\n");
         CHECK(CNET_enable_application(ALLNODES));
         for ( int ii = 0; ii < nodeinfo.nlinks; ii++ )
             CNET_set_LED(ii, "green" );
@@ -489,7 +485,7 @@ static void timeout_link_1(CnetEvent ev, CnetTimerID timer, CnetData data)
 
     // GET FRAME THAT TIMED OUT FROM WINDOW + RESEND FRAME ON LINK 1
     int seqNum = (int)data;
-    printf("TIMEOUT:\nOUT LINK: %d\nSEQ NO: %d\n", frame.link, seqNum);
+    printf("TIMEOUT:\nOUT LINK: %d\nSEQ NO: %d\n\n", frame.link, seqNum);
     frame = window[frame.link - 1][seqNum];
     transmit_frame(frame);
 
@@ -509,7 +505,7 @@ static void timeout_link_2(CnetEvent ev, CnetTimerID timer, CnetData data)
 
     // GET FRAME THAT TIMED OUT FROM WINDOW + RESEND FRAME ON LINK 2
     int seqNum = (int)data;
-    printf("TIMEOUT:\nOUT LINK: %d\nSEQ NO: %d\n", frame.link, seqNum);
+    printf("TIMEOUT:\nOUT LINK: %d\nSEQ NO: %d\n\n", frame.link, seqNum);
     frame = window[frame.link - 1][seqNum];
     transmit_frame(frame);
 
@@ -529,7 +525,7 @@ static void timeout_link_3(CnetEvent ev, CnetTimerID timer, CnetData data)
 
     // GET FRAME THAT TIMED OUT FROM WINDOW + RESEND FRAME ON LINK 3
     int seqNum = (int)data;
-    printf("TIMEOUT:\nOUT LINK: %d\nSEQ NO: %d\n", frame.link, seqNum);
+    printf("TIMEOUT:\nOUT LINK: %d\nSEQ NO: %d\n\n", frame.link, seqNum);
     frame = window[frame.link - 1][seqNum];
     transmit_frame(frame);
 
@@ -549,7 +545,7 @@ static void timeout_link_4(CnetEvent ev, CnetTimerID timer, CnetData data)
 
     // GET FRAME THAT TIMED OUT FROM WINDOW + RESEND FRAME ON LINK 4
     int seqNum = (int)data;
-    printf("TIMEOUT:\nOUT LINK: %d\nSEQ NO: %d\n", frame.link, seqNum);
+    printf("TIMEOUT:\nOUT LINK: %d\nSEQ NO: %d\n\n", frame.link, seqNum);
     frame = window[frame.link - 1][seqNum];
     transmit_frame(frame);
 
@@ -674,11 +670,11 @@ static void print_buffers(int link)
 
 
     // PRINT WINDOW STATUS INDICATORS
-    printf("WINDOW:\t[%d|%d]=%d\n", ackExpected[link - 1],
+    printf("WINDOW:\t[%d|%d] = %d\n", ackExpected[link - 1],
                                     nextFrameToSend[link - 1],
                                     numInWindow[link - 1]);
     // PRINT BUFFER START, FINISH AND NUMBER OF ITEMS
-    printf("BUFFER:\t[%d|%d]=%d\n", bufferBounds[link - 1][0],
+    printf("BUFFER:\t[%d|%d] = %d\n\n", bufferBounds[link - 1][0],
                                     bufferBounds[link - 1][1],
                                     numInBuffer[link - 1]);
 }
