@@ -158,9 +158,11 @@ static void datalink_down(FRAME frame, int inLink, int outLink)
             inc(&frameExpected[inLink - 1]);
 
             frame.seq = nextFrameToSend[outLink - 1];
+            // STORE FRAME IN THE OUTGOING WINDOW
             window[outLink - 1][nextFrameToSend[outLink - 1]] = frame;
             numInWindow[outLink - 1] += 1;
 
+            // TRANSMIT THE FRAME OUT
             frame.link = outLink;
             transmit_frame(frame);
             inc(&nextFrameToSend[outLink - 1]); 
@@ -173,6 +175,7 @@ static void datalink_down(FRAME frame, int inLink, int outLink)
                 transmit_ack(inLink, frame.seq);
                 inc(&frameExpected[inLink - 1]);
 
+                // STORE FRAME IN THE BUFFER
                 buffer[outLink - 1][bufferBounds[outLink - 1][1]] = frame;
                 numInBuffer[outLink - 1] += 1;
                 inc(&bufferBounds[outLink - 1][1]);
@@ -188,10 +191,12 @@ static void datalink_down(FRAME frame, int inLink, int outLink)
         // IF THE WINDOW IS CURRENTLY FULL
         if (numInWindow[outLink - 1] >= MAX_SEQ)
         {
-            // DISABLE GENERATION OF NEW MESSAGES
+            // DISABLE GENERATION OF NEW MESSAGES WHILE WINDOW IS FULL
 
             for ( int ii = 0; ii < NUM_NODES; ii++ )
             { 
+
+                // ONLY DISABLE MESSAGES FOR DESTINATION ROUTED THROUGH outLink
                 if ( routingTable[nodeinfo.nodenumber][ii] == outLink )
                 {    
                     CNET_disable_application( ii );
@@ -233,6 +238,7 @@ static void datalink_down(FRAME frame, int inLink, int outLink)
         // IF THE WINDOW IS CURRENTLY FULL
         if (numInWindow[inLink - 1] >= MAX_SEQ)
         {
+            // ONLY DISABLE MESSAGES FOR DESTINATION ROUTED THROUGH outLink                       
             for ( int ii = 0; ii < NUM_NODES; ii++ )
             { 
                 if ( routingTable[nodeinfo.nodenumber][ii] == inLink )
@@ -395,7 +401,8 @@ static void ack_received(FRAME frame, int link)
     }
     else
     {
-        // SHOULD NEVER OCCUR IF CODING IS CORRECT. STILL CHECK REGARDLESS
+        // ERRORS SHOULD ALL BE CAUGHT BEFORE THIS
+        // STILL CHECK REGARDLESS, AS A FAILSAFE
         printf("\n\t\t\t\t\tERROR: OUTSIDE WINDOW BOUNDS\n");
     }
 
@@ -404,7 +411,6 @@ static void ack_received(FRAME frame, int link)
     {
         // ADD FRAMES FROM THE BUFFER TO THE WINDOW
         printf("\t\t\t\t\tSENDING FRAME FROM BUFFER\n");
-        //print_buffers(link);
 
         // REMOVE FRAME FROM THE FRONT OF THE BUFFER
         tempFrame = buffer[link - 1][bufferBounds[link - 1][0]];
@@ -422,7 +428,8 @@ static void ack_received(FRAME frame, int link)
         inc(&nextFrameToSend[link - 1]);
     }
 
-    // IF WINDOW NOT FULL AND BUFFER IS EMPTY
+    // IF ALL LINK WINDOWS NOT FULL AND ALL BUFFER'S EMPTY
+    // THIS KEEPS EFFICIECNY AS HIGH AS POSSIBLE
     first  = ( numInBuffer[0] == 0 ) && ( numInWindow[0] < MAX_SEQ );
     second = ( numInBuffer[1] == 0 ) && ( numInWindow[1] < MAX_SEQ );
     third  = ( numInBuffer[2] == 0 ) && ( numInWindow[2] < MAX_SEQ );
