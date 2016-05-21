@@ -5,7 +5,7 @@ compile			= "assignment.c"
 
 bandwidth           = 99999999Mbps,
 messagerate         = 1000ms,
-propagationdelay    = 250ms,
+propagationdelay    = 100ms,
 probframecorrupt    = 5,
 probframeloss       = 5,
 mapcolour           = "cyan"

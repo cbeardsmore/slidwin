@@ -594,7 +594,7 @@ void reboot_node(CnetEvent ev, CnetTimerID timer, CnetData data)
             timers[ii][jj] = NULLTIMER;
 
     // ENABLE ALL NODES TO SEND TO ALL OTHER NODES
-    CHECK(CNET_enable_application(ALLNODES));
+    CHECK(CNET_enable_application(ALLNODES));      
 
     // SET LEDS FOR LINKS TO ALL GREEN INITIALLY
     for ( int jj = 0; jj < nodeinfo.nlinks; jj++ )
