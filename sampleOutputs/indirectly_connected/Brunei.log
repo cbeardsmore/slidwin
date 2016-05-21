@@ -1,0 +1,52 @@
+
+					DATA RECEIVED
+					SOURCE:	New Zealand
+					DEST:	Brunei
+					IN LINK:	1
+					SEQ NO:	0
+					DATA:	
+					LENGTH:	22114
+
+ACK TRANSMITTED
+VIA LINK:	1
+SEQ NO:	0
+
+
+					DATA RECEIVED
+					SOURCE:	New Zealand
+					DEST:	Brunei
+					IN LINK:	1
+					SEQ NO:	1
+					DATA:	
+					LENGTH:	12636
+
+ACK TRANSMITTED
+VIA LINK:	1
+SEQ NO:	1
+
+
+					DATA RECEIVED
+					SOURCE:	New Zealand
+					DEST:	Brunei
+					IN LINK:	1
+					SEQ NO:	2
+					DATA:	
+					LENGTH:	1135
+
+ACK TRANSMITTED
+VIA LINK:	1
+SEQ NO:	2
+
+
+					DATA RECEIVED
+					SOURCE:	New Zealand
+					DEST:	Brunei
+					IN LINK:	1
+					SEQ NO:	3
+					DATA:	
+					LENGTH:	14185
+
+ACK TRANSMITTED
+VIA LINK:	1
+SEQ NO:	3
+
