@@ -24,6 +24,11 @@
 #define LAST_LED         5         // ID OF THE LAST CNET LED
 #define NUM_NODES        7         // TOTAL NODES IN THE SYSTEM
 
+ // NOTE: THE VALUE OF T_MOD MUST BE SET RELATIVE TO THE BANDWIDTH 
+ //       PROVIDED WITHIN THE TOPOLOGY FILE. IF THE VALUE OF T_MOD
+ //       IS TOO LOW, CNET WILL FORCE A ER_TOOBUSY EVENT DUE TO 
+ //       A LARGE NUMBER OF TIMEOUTS RELATIVE TO MESSAGES RECEIVED
+
 //**************************************************************************
 // GLOBAL VARIABLES - FOR SIMULATION ONLY
 //**************************************************************************
