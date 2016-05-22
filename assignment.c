@@ -3,7 +3,7 @@
 *  AUTHOR: Connor Beardsmore - 15504319
 *  UNIT: CC Assignment. S1 - 2016
 *  PURPOSE: Sliding window protocol on a 7-node network via CNET simulator
-*  LAST MOD: 16/05/16
+*  LAST MOD: 22/05/16
 *  REQUIRES: assignment.h
 ***************************************************************************/
 

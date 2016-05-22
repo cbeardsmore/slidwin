@@ -14,35 +14,29 @@ Implementation of a *Sliding Window* protocol on a network of 7 nodes. The proto
  
 #####File List
 
-	.c FILES
-	--------
-	assignment.c
 
-	.h FILES
-	--------
-	assignment.h
-
-	OTHER
-	-----
+	assignment.c   - Layered architecture functionality
+	assignment.h   - Header file containing global variables and constants
+	ASSIGNMENT     - CNET topology file
+	/sampleOutputs - Sample log file from test outputs
+	/documentation - Report describing design and implementation issues
 	Makefile
 	README.md
-	ASSIGNMENT
-
+	
 #####Instructions to Run
 
 The protocol is designed to work on the CNET network simulator and thus, requires a CNET installation to run. CNET documentation can be found at the following link:
 
 <http://www.csse.uwa.edu.au/cnet/>
 
-To execute the simulation through CNET, run the following command and flags:
+To execute the simulation through CNET, run the following command:
 
-	cnet -s -O ASSIGNMENT
+	make run
 
-CNET has a range of flags that can be employed for various additional functionality.
+CNET has a range of flags that can be employed for various additional functionality. Utilizing the following make command will run the simulation using the "-g" flag to run on startup:
+
+	make start
+
 After running, all created log and executable files can be removed via:
 
 	make clean
-
-#####References
-
-none

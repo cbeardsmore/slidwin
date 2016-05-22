@@ -3,7 +3,7 @@
  *  AUTHOR: Connor Beardsmore - 15504319
  *  UNIT: CC Assignment. S1 - 2016
  *  PURPOSE: Header File for assignment.c
- *  LAST MOD: 16/05/16
+ *  LAST MOD: 22/05/16
  *  REQUIRES: cnet.h, stdlib.h, stdio.h, string.h
  ***************************************************************************/
 
@@ -73,15 +73,19 @@ static char* nodenames[7] = {"Australia", "Fiji", "New Zealand", "Indonesia",
 static CnetTimerID timers[MAX_LINKS+1][MAX_SEQ + 1];
 
 //**************************************************************************
-// BUFFERS, WINDOWS + STORAGE
+// WINDOW
 //*************************************************************************
 
-// NUM ITEMS IN WINDOW
+// NUMBER ITEMS CURRENTLY IN WINDOW
 static int numInWindow[MAX_LINKS] = {0, 0, 0, 0};
 
 // WINDOW STORING UNACKNOWLEDGED FRAMES
 // EVERY NODE HAS WINDOW OF SIZE MAX_SEQ + 1 FOR EVERY LINK
 static FRAME window[MAX_LINKS][MAX_SEQ + 1];
+
+//**************************************************************************
+// BUFFER
+//*************************************************************************
 
 // NUM ITEMS IN BUFFER
 static int numInBuffer[MAX_LINKS] = {0, 0, 0, 0};
@@ -89,10 +93,15 @@ static int numInBuffer[MAX_LINKS] = {0, 0, 0, 0};
 // START AND END INDEX FOR EACH BUFFER, USING A CIRCULAR BUFFER
 // START INDEX IS FIRST FULL INDEX
 // LAST INDEX IS LAST EMPTY INDEX
+
 static int bufferBounds[MAX_LINKS][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}};
 
-// WINDOW STORING UNACKNOWLEDGED FRAMES...AGAIN
+// WINDOW STORING UNACKNOWLEDGED OVERFLOW FRAMES
 static FRAME buffer[MAX_LINKS][MAX_SEQ + 1];
+
+//**************************************************************************
+// STATUS INDICATORS
+//*************************************************************************
 
 // EXPECTED ACK SEQ NUM FOR NEXT INCOMING ACK FOR EVERY LINK
 static  int ackExpected[MAX_LINKS]	    = {0, 0, 0, 0};
@@ -100,7 +109,6 @@ static  int ackExpected[MAX_LINKS]	    = {0, 0, 0, 0};
 static	int	nextFrameToSend[MAX_LINKS]	= {0, 0, 0, 0};
 // SEQ NUM OF NEXT EXPECTED FRAME FOR EVERY LINK
 static	int	frameExpected[MAX_LINKS]    = {0, 0, 0, 0};
-
 
 //**************************************************************************
 // FUNCTION PROTOTYPES
