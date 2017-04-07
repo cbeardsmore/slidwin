@@ -1,3 +1,4 @@
 *.o
 *.cnet
 .DS_Store
+*Report.pdf

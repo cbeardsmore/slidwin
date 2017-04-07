@@ -1,4 +1,4 @@
-######Semester 1, 2016
+#####Semester 1, 2016
 
 ##CC200 Assignment  
 
@@ -7,7 +7,7 @@
 Implementation of a *Sliding Window* protocol on a network of 7 nodes. The protocol is built for use on the CNET network simulator and utilizes functionality from the CNET API. The network topology and node links are illustrated below.
 
 <center>
-	![toplogy image](./documentation/topologyimage.png)
+	![toplogy image](./documentation/	topologyimage.png)
 </center>
 
  
@@ -39,3 +39,4 @@ CNET has a range of flags that can be employed for various additional functional
 After running, all created log and executable files can be removed via:
 
 	make clean
+	
