@@ -1,12 +1,12 @@
-#####Semester 1, 2016
+# slidwin
 
-##CC200 Assignment  
+##### Computer Communications 200 - Sliding Window Protocol
 
-#####Purpose
+##### Purpose
 
 Implementation of a *Sliding Window* protocol on a network of 7 nodes. The protocol is built for use on the CNET network simulator and utilizes functionality from the CNET API.
 
- 
+
 ##### File List
 
 
@@ -16,7 +16,7 @@ Implementation of a *Sliding Window* protocol on a network of 7 nodes. The proto
 	/sampleOutputs - Sample log file from test outputs
 	Makefile
 	README.md
-	
+
 ##### Instructions to Run
 
 The protocol is designed to work on the CNET network simulator and thus, requires a CNET installation to run. CNET documentation can be found at the following link:
@@ -34,4 +34,3 @@ CNET has a range of flags that can be employed for various additional functional
 After running, all created log and executable files can be removed via:
 
 	make clean
-	
