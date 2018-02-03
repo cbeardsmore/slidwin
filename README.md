@@ -4,25 +4,20 @@
 
 #####Purpose
 
-Implementation of a *Sliding Window* protocol on a network of 7 nodes. The protocol is built for use on the CNET network simulator and utilizes functionality from the CNET API. The network topology and node links are illustrated below.
-
-<center>
-	![toplogy image](./documentation/	topologyimage.png)
-</center>
+Implementation of a *Sliding Window* protocol on a network of 7 nodes. The protocol is built for use on the CNET network simulator and utilizes functionality from the CNET API.
 
  
-#####File List
+##### File List
 
 
 	assignment.c   - Layered architecture functionality
 	assignment.h   - Header file containing global variables and constants
-	ASSIGNMENT     - CNET topology file
+	config         - CNET topology file
 	/sampleOutputs - Sample log file from test outputs
-	/documentation - Report describing design and implementation issues
 	Makefile
 	README.md
 	
-#####Instructions to Run
+##### Instructions to Run
 
 The protocol is designed to work on the CNET network simulator and thus, requires a CNET installation to run. CNET documentation can be found at the following link:
 
